@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,10 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.tech4me.tech4pizzaria.model.Pizza;
 import br.com.tech4me.tech4pizzaria.service.PizzaService;
 import br.com.tech4me.tech4pizzaria.shared.PizzaCompletoDto;
 import br.com.tech4me.tech4pizzaria.shared.PizzaDto;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/pizzas")
@@ -26,6 +27,11 @@ public class PizzaController {
 
     @Autowired
     private PizzaService servico;
+
+    @GetMapping("/porta")
+    public String obterPorta(@Value("${local.server.port}") String porta) {
+        return "A instãncia que respondeu a requisição está rodando na porta " + porta;
+    }
     
     @GetMapping
     private ResponseEntity<List<PizzaDto>> obterPizzas() {
@@ -44,7 +50,7 @@ public class PizzaController {
     }
 
     @PostMapping
-    private ResponseEntity<PizzaCompletoDto> cadastrarPizza(@RequestBody PizzaCompletoDto pizza) {
+    private ResponseEntity<PizzaCompletoDto> cadastrarPizza(@RequestBody @Valid PizzaCompletoDto pizza) {
         return new ResponseEntity<>(servico.cadastrar(pizza), HttpStatus.CREATED);
     }
 
@@ -55,7 +61,7 @@ public class PizzaController {
     }
 
     @PutMapping("/{id}")
-    private ResponseEntity<PizzaCompletoDto> atualizarPizza(@PathVariable String id, @RequestBody PizzaCompletoDto pizza) {
+    private ResponseEntity<PizzaCompletoDto> atualizarPizza(@PathVariable String id, @RequestBody @Valid PizzaCompletoDto pizza) {
         PizzaCompletoDto pizzaAtualizada = servico.atualizarPorId(id, pizza);
 
         if (pizzaAtualizada != null) {
